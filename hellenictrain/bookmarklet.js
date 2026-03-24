@@ -1,57 +1,43 @@
 javascript: (() => {
   /*
-    Inject custom styles, once.
+    Minimal CSS: Only grid layout for management panel. All other styles come from site CSS.
   */
-  const styles = `
-      #bahn-bm-root { background:#fff; box-shadow:0 2px 24px #0003; margin-top:40px; margin-bottom:40px; }
-      #bahn-bm-root h3 { font-size:1.4rem; margin-bottom:12px; }
-      #bahn-bm-root label { display:block; font-weight:bold; margin-top:8px; }
-      #bahn-bm-root input, #bahn-bm-root select { margin:2px 0 8px; width:100%; max-width:295px; display:block; padding:7px 10px; border-radius:4px; border:1px solid #CCC; }
-      #bahn-bm-root input[type="radio"] { width:auto; display:inline; margin-right:6px; }
-      #bahn-bm-root .bahn-bm-radio-group { margin-bottom:12px; }
-      #bahn-bm-root .bahn-bm-row { display:flex; flex-wrap:wrap; gap:16px; }
-      #bahn-bm-root .bahn-bm-col { flex:1; min-width:200px; }
-      #bahn-bm-root button { margin-top:14px; padding:10px 22px; background:#0047bb; color:#fff; font-weight:bold; border:none; border-radius:4px; cursor:pointer; }
-      #bahn-bm-root .bahn-bm-result { margin-top:16px; padding:16px 10px; background:#f8f7fa;}
-      .bahn-bm-ticket-details .bm-title { font-size:1.1rem; font-weight:bold; margin-bottom:10px; }
-      .bahn-bm-ticket-details .bm-row { display:flex; align-items:center; margin-bottom:8px; gap:14px; flex-wrap:wrap;}
-      .bahn-bm-ticket-details .bm-label { min-width:96px; color:#888; font-weight:bold; }
-      .bahn-bm-ticket-details .bm-value { font-family:inherit; font-size:1.08em; }
-      .bahn-bm-ticket-details .bm-pax-table { width:100%; border-collapse:collapse; margin-top:18px;}
-      .bahn-bm-ticket-details .bm-pax-table th,
-      .bahn-bm-ticket-details .bm-pax-table td { border:1px solid #ddd; padding:4px 10px;}
-      .bahn-bm-ticket-details .bm-pax-table th { background: #e3e6ed;}
-      .bahn-bm-ticket-details .bm-pax-table td { background:#fff;}
-      .bahn-bm-ticket-details .bm-section-title { margin-top: 18px; font-size:1.05em; font-weight:bold; color:#225; }
-      .bahn-bm-ticket-details .bm-offer-info { font-size:0.95em; color:#446; }
-      .bahn-bm-ticket-details .bm-price { font-size:1.13em; font-weight:bold; }
-      .bahn-bm-ticket-details .bm-small { font-size:0.95em; color:#666; }
-      .bahn-bm-managebox { margin-top:24px; margin-bottom:16px; background:#f3f5f7; padding:18px; box-shadow:0 1px 5px #0001; }
-      .bahn-bm-managebox-title { font-size:1.1em; font-weight:bold; margin-bottom:8px; color:#00307f; }
-      .bahn-bm-management-panel { display: flex; flex-direction: column; gap:0; }
-      .bahn-bm-management-panel .bm-panel-item { color:#0047bb; background:transparent; text-decoration:none; font-weight:600; border:none; border-bottom:1px solid #e3e6ed; text-align:left; padding:10px 0 10px 0; cursor:pointer; font-size:1em; transition: background 0.1s; }
-      .bahn-bm-management-panel .bm-panel-item:last-child { border-bottom:none; }
-      .bahn-bm-management-panel .bm-panel-item:hover { background:#d9e2ee; }
-      .bahn-bm-managebox-result { margin-top:18px; padding:12px 10px; background:#f0f5fd; color:#222; font-family:monospace; font-size:13px; border:1px solid #e0ebfc; white-space:pre-wrap; word-break:break-all; border-radius:6px; }
-    `;
-  if (!document.getElementById("bahn-bm-styles")) {
+  const minimalStyles = `
+.bahn-bm-management-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom:1rem;
+}
+.bahn-bm-management-panel .bm-panel-item {
+  width: 100%;
+  margin: 0;
+  white-space: normal;
+}
+.bahn-bm-management-panel .bm-panel-item:nth-child(5) {
+  grid-column: span 2;
+  justify-self: center;
+  width: 60%;
+}
+.bahn-bm-managebox-result {
+  margin-top:1rem;
+  font-family:monospace;
+  font-size:13px;
+  white-space:pre-wrap;
+  word-break:break-all;
+  border-radius:0.5rem;
+}
+`;
+  if (!document.getElementById("bahn-bm-minimal-styles")) {
     const styleElem = document.createElement("style");
-    styleElem.id = "bahn-bm-styles";
-    styleElem.innerHTML = styles;
+    styleElem.id = "bahn-bm-minimal-styles";
+    styleElem.innerHTML = minimalStyles;
     document.head.appendChild(styleElem);
   }
-
-  /*
-    Remove old container if present.
-  */
   const prevContainer = document.getElementById("bahn-bm-container");
   if (prevContainer) prevContainer.remove();
-
-  /*
-    Helper: Send ticket search request to endpoint.
-  */
-  const sendTicketSearch = (payload) => {
-    return fetch(
+  const sendTicketSearch = (payload) =>
+    fetch(
       "https://newtickets.hellenictrain.gr/Channels.Website.BFF.WEB/website/travel/recover",
       {
         headers: { "content-type": "application/json" },
@@ -61,11 +47,6 @@ javascript: (() => {
           "https://newtickets.hellenictrain.gr/Channels.HellenicTrainWeb/",
       },
     ).then((res) => res.json());
-  };
-
-  /*
-    Find IDs for management actions.
-  */
   const findIds = (solution, requestedAction) => {
     if (requestedAction === "ADD_ADDITIONAL_SERVICE") {
       return solution?.resourceId ? [solution.resourceId] : [];
@@ -78,10 +59,6 @@ javascript: (() => {
     }
     return [];
   };
-
-  /*
-    Definitions for management actions, only accepts IDs as arguments.
-  */
   const MANAGEMENT_URL =
     "https://newtickets.hellenictrain.gr/Channels.Website.BFF.WEB/website/secondcontact/select";
   const ACTIONS_TO_REQUEST = {
@@ -105,42 +82,34 @@ javascript: (() => {
       body: { action: "REFUND", resourceIds },
       method: "POST",
     }),
+    downloadPdf: (resourceId) => ({
+      url: `https://newtickets.hellenictrain.gr/Channels.Website.BFF.WEB/website/post/purchase/pdf?resourceId=${resourceId}`,
+      method: "GET",
+    }),
   };
-
-  /*
-    Management panel option metadata.
-  */
   const MANAGEMENT_OPTIONS = [
     {
       key: "changeDateTime",
       label: "Change Date/Time",
       action: "BOOKING_CHANGE",
     },
-    { key: "changeTicket", label: "Change Ticket", action: "TRAVEL_CHANGE" },
+    {
+      key: "changeTicket",
+      label: "Change Ticket",
+      action: "TRAVEL_CHANGE",
+    },
     {
       key: "addServices",
       label: "Add Services",
       action: "ADD_ADDITIONAL_SERVICE",
     },
     { key: "refund", label: "Refund", action: "REFUND" },
-    {
-      key: "downloadPdf",
-      label: "Download PDF",
-      action: "DOWNLOAD_PDF",
-    },
+    { key: "downloadPdf", label: "Download PDF", action: "DOWNLOAD_PDF" },
   ];
-
-  /*
-    Helper: Checks if a date is in DST.
-  */
   const isDST = (date) => {
     const jan = new Date(Date.UTC(date.getFullYear(), 0, 1));
     return date.getTimezoneOffset() < jan.getTimezoneOffset();
   };
-
-  /*
-    Helper: Format a time in a given zone.
-  */
   const formatZoned = (iso, zone) => {
     if (!iso) return "";
     const date = new Date(iso);
@@ -159,46 +128,34 @@ javascript: (() => {
     if (zone === "Europe/Athens") abbr = isDST(date) ? "EEST" : "EET";
     return `${dateStr.replace(",", "")} ${abbr}`;
   };
-
-  /*
-    Render a management panel as a DOM node, for a solution object.
-  */
   const renderManagementPanel = (solution) => {
     const manageRoot = document.createElement("div");
-    manageRoot.className = "bahn-bm-managebox";
+    manageRoot.className = "card p-3 my-2 bahn-bm-managebox";
     manageRoot.id = "bahn-bm-management-panel-root";
     manageRoot.innerHTML = `
-      <div class="bahn-bm-managebox-title">Manage</div>
-      <div class="bahn-bm-management-panel">
-        ${MANAGEMENT_OPTIONS.map(
-          (option) => `
-          <button class="bm-panel-item" type="button" data-manage-key="${option.key}">${option.label}</button>
-        `,
-        ).join("")}
-      </div>
-      <div class="bahn-bm-managebox-result" style="display:none;"></div>
-    `;
-
+    <h5 class="mb-3">Manage</h5>
+    <div class="bahn-bm-management-panel mb-2">
+      ${MANAGEMENT_OPTIONS.map(
+        (option) =>
+          `<button class="btn btn-orange btn-block bm-panel-item" type="button" data-manage-key="${option.key}">${option.label}</button>`,
+      ).join("")}
+    </div>
+    <div class="bahn-bm-managebox-result alert-secondary p-2" style="display:none;"></div>
+  `;
     const panel = manageRoot.querySelector(".bahn-bm-management-panel");
     const outbox = manageRoot.querySelector(".bahn-bm-managebox-result");
-
     panel.querySelectorAll(".bm-panel-item").forEach((button) => {
       const key = button.dataset.manageKey;
       const mgmtConf = MANAGEMENT_OPTIONS.find((option) => option.key === key);
-
       button.addEventListener("click", async () => {
         if (key === "downloadPdf") {
-          /* PDF download logic */
           outbox.style.display = "block";
           outbox.textContent = "Downloading PDF...";
           const resourceId = solution.resourceId;
           try {
             const res = await fetch(
               ACTIONS_TO_REQUEST.downloadPdf(resourceId).url,
-              {
-                method: "GET",
-                credentials: "same-origin",
-              },
+              { method: "GET", credentials: "same-origin" },
             );
             if (!res.ok) {
               outbox.textContent =
@@ -223,7 +180,6 @@ javascript: (() => {
           }
           return;
         }
-        /* Normal action logic */
         const resourceIds = findIds(solution, mgmtConf.action);
         if (!ACTIONS_TO_REQUEST[key]) {
           outbox.style.display = "block";
@@ -249,10 +205,6 @@ javascript: (() => {
     });
     return manageRoot;
   };
-
-  /*
-    Format search result as HTML, but inserts manage panel placeholders.
-  */
   const formatTicketResponse = (ticketData) => {
     if (
       !ticketData?.solutions ||
@@ -262,11 +214,10 @@ javascript: (() => {
       return "<div>No valid ticket data found.</div>";
     }
     const purchaseDate = ticketData.purchaseDate
-      ? `<div class="bm-row"><span class="bm-label">Purchased on:</span><span class="bm-value">${formatZoned(ticketData.purchaseDate, "Europe/Berlin")}</span></div>`
+      ? `<div class="mb-2"><b>Purchased on:</b> ${formatZoned(ticketData.purchaseDate, "Europe/Berlin")}</div>`
       : "";
     let html = '<div class="bahn-bm-ticket-details">';
-    if (purchaseDate)
-      html += `<div class="bm-title">Trip Details</div>${purchaseDate}`;
+    if (purchaseDate) html += `<h5>Trip Details</h5>${purchaseDate}`;
     ticketData.solutions.forEach((solution, idx) => {
       const container = solution.solutionContainer;
       if (!container) return;
@@ -289,45 +240,28 @@ javascript: (() => {
           `${summary.children} Child${summary.children > 1 ? "ren" : ""}`,
         );
       html += `
-        <div class="bm-row">
-          <span class="bm-label">From:</span><span class="bm-value">${origin}</span>
-          <span class="bm-label">To:</span><span class="bm-value">${destination}</span>
-        </div>
-        <div class="bm-row">
-          <span class="bm-label">Departure:</span><span class="bm-value">${depTime}</span>
-          <span class="bm-label">Arrival:</span><span class="bm-value">${arrTime}</span>
-        </div>
-        <div class="bm-row">
-          <span class="bm-label">Passengers:</span><span class="bm-value">${passengerArr.join(", ") || "Unknown"}</span>
-          <span class="bm-label">Price:</span><span class="bm-value bm-price">${summary.totalPrice ? summary.totalPrice.amount.toLocaleString("de-DE", { minimumFractionDigits: 2 }) + (summary.totalPrice.currency || "") : "-"}</span>
-        </div>
-      `;
+      <div><b>From:</b> ${origin} <b>To:</b> ${destination}</div>
+      <div><b>Departure:</b> ${depTime} <b>Arrival:</b> ${arrTime}</div>
+      <div><b>Passengers:</b> ${passengerArr.join(", ") || "Unknown"} <b>Price:</b> <span style="font-weight:bold;">${summary.totalPrice ? summary.totalPrice.amount.toLocaleString("de-DE", { minimumFractionDigits: 2 }) + (summary.totalPrice.currency || "") : "-"}</span></div>
+    `;
       (container.nodeSummaries || []).forEach((node) => {
         const nodeView = node.nodeView || {};
         const train = nodeView.train || {};
         html += `
-          <div class="bm-section-title">Connection</div>
-          <div class="bm-row bm-small">
-            <span class="bm-label">From:</span><span class="bm-value">${nodeView.origin || ""}</span>
-            <span class="bm-label">Time:</span><span class="bm-value">${nodeView.departureTime ? formatZoned(nodeView.departureTime, "Europe/Athens") : ""}</span>
-          </div>
-          <div class="bm-row bm-small">
-            <span class="bm-label">To:</span><span class="bm-value">${nodeView.destination || ""}</span>
-            <span class="bm-label">Time:</span><span class="bm-value">${nodeView.arrivalTime ? formatZoned(nodeView.arrivalTime, "Europe/Athens") : ""}</span>
-          </div>
-          <div class="bm-row bm-small">
-            <span class="bm-label">Mode:</span><span class="bm-value">${train.denomination || ""} ${train.name || ""}</span>
-            ${node.pnr ? `<span class="bm-label">PNR:</span><span class="bm-value">${node.pnr}</span>` : ""}
-          </div>
-        `;
+        <div class="mt-2"><strong>Connection</strong></div>
+        <div><b>From:</b> ${nodeView.origin || ""} <b>Time:</b> ${nodeView.departureTime ? formatZoned(nodeView.departureTime, "Europe/Athens") : ""}</div>
+        <div><b>To:</b> ${nodeView.destination || ""} <b>Time:</b> ${nodeView.arrivalTime ? formatZoned(nodeView.arrivalTime, "Europe/Athens") : ""}</div>
+        <div><b>Mode:</b> ${train.denomination || ""} ${train.name || ""} ${node.pnr ? `<b>PNR:</b> ${node.pnr}` : ""}</div>
+      `;
         const offers = (node.offerContainerSummaryViews || []).flatMap(
           (summaryView) => summaryView.offerSummaryViews || [],
         );
         if (offers.length > 0) {
           html += `
-            <div class="bm-section-title">Passenger Details</div>
-            <table class="bm-pax-table">
-              <tr><th>Name</th><th>Service</th><th>Offer</th><th>Seat</th><th>Car</th><th>CP</th><th>Price</th></tr>
+          <div class="mt-2"><b>Passenger Details</b></div>
+          <table class="table table-bordered table-sm mt-1 mb-2">
+            <thead><tr><th>Name</th><th>Service</th><th>Offer</th><th>Seat</th><th>Car</th><th>CP</th><th>Price</th></tr></thead>
+            <tbody>
               ${offers
                 .map((offer) => {
                   const passenger = offer.traveller || {};
@@ -344,59 +278,84 @@ javascript: (() => {
                     </tr>`;
                 })
                 .join("")}
-            </table>
-          `;
+            </tbody>
+          </table>
+        `;
         }
       });
-      /* Insert a unique panel placeholder per solution. */
       html += `<div class="bm-manage-placeholder" data-placeholder-idx="${idx}"></div>`;
     });
     html += "</div>";
     return html;
   };
-
-  /*
-    Build main UI and insert into the DOM.
-  */
   const html = `
-    <div class="container" id="bahn-bm-container">
-      <div id="bahn-bm-root" class="card border-0 rounded-0 mt-5 py-4 px-sm-4 search-widgets search-widgets-bg">
-        <h3>Find & Manage Train Tickets (Beta)</h3>
-        <div class="bahn-bm-radio-group">
-          <label><input type="radio" name="bm-mode" value="findTicket" checked /> Find Ticket</label>
-          <label><input type="radio" name="bm-mode" value="findWithPnrCp" /> Find by PNR/CP</label>
-          <label><input type="radio" name="bm-mode" value="guest" /> Guest Ticket (no Account)</label>
+  <div class="container" id="bahn-bm-container">
+    <div id="bahn-bm-root" class="card border-0 rounded p-3 mt-5">
+      <h3>Find & Manage Train Tickets (Beta)</h3>
+      <div class="form-group mb-3">
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="bm-mode" value="findTicket" checked /> Find Ticket
+          </label>
         </div>
-        <div class="bahn-bm-fields" id="bahn-bm-fields-findTicket">
-          <div class="bahn-bm-row">
-            <div class="bahn-bm-col"><label for="bm-email">E-Mail</label><input id="bm-email" type="email" placeholder="E-Mail"></div>
-            <div class="bahn-bm-col"><label for="bm-pnr">PNR / Ticket Code</label><input id="bm-pnr" type="text" placeholder="Code"></div>
-          </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="bm-mode" value="findWithPnrCp" /> Find by PNR/CP
+          </label>
         </div>
-        <div class="bahn-bm-fields" id="bahn-bm-fields-findWithPnrCp" style="display:none;">
-          <div class="bahn-bm-row">
-            <div class="bahn-bm-col"><label for="bm-pnr2">PNR</label><input id="bm-pnr2" type="text" placeholder="PNR"></div>
-            <div class="bahn-bm-col"><label for="bm-cp2">CP</label><input id="bm-cp2" type="text" placeholder="CP"></div>
-          </div>
+        <div class="form-check form-check-inline">
+          <label class="form-check-label">
+            <input type="radio" class="form-check-input" name="bm-mode" value="guest" /> Guest Ticket (no Account)
+          </label>
         </div>
-        <div class="bahn-bm-fields" id="bahn-bm-fields-guest" style="display:none;">
-          <div class="bahn-bm-row">
-            <div class="bahn-bm-col"><label for="bm-vorname">First name</label><input id="bm-vorname" type="text" placeholder="First name"></div>
-            <div class="bahn-bm-col"><label for="bm-nachname">Last name</label><input id="bm-nachname" type="text" placeholder="Last name"></div>
-            <div class="bahn-bm-col"><label for="bm-code">Lookup Code</label><input id="bm-code" type="text" placeholder="Lookup code"></div>
-          </div>
-        </div>
-        <button id="bm-search-btn" type="button">Search</button>
-        <div class="bahn-bm-result" id="bahn-bm-result" style="display:none;"></div>
       </div>
+      <div id="bahn-bm-fields-findTicket">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="bm-email">E-Mail</label>
+            <input id="bm-email" type="email" class="form-control" placeholder="E-Mail" />
+          </div>
+          <div class="form-group col-md-6">
+            <label for="bm-pnr">PNR / Ticket Code</label>
+            <input id="bm-pnr" type="text" class="form-control" placeholder="Code" />
+          </div>
+        </div>
+      </div>
+      <div id="bahn-bm-fields-findWithPnrCp" style="display:none;">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="bm-pnr2">PNR</label>
+            <input id="bm-pnr2" type="text" class="form-control" placeholder="PNR" />
+          </div>
+          <div class="form-group col-md-6">
+            <label for="bm-cp2">CP</label>
+            <input id="bm-cp2" type="text" class="form-control" placeholder="CP" />
+          </div>
+        </div>
+      </div>
+      <div id="bahn-bm-fields-guest" style="display:none;">
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="bm-vorname">First name</label>
+            <input id="bm-vorname" type="text" class="form-control" placeholder="First name" />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="bm-nachname">Last name</label>
+            <input id="bm-nachname" type="text" class="form-control" placeholder="Last name" />
+          </div>
+          <div class="form-group col-md-4">
+            <label for="bm-code">Lookup Code</label>
+            <input id="bm-code" type="text" class="form-control" placeholder="Lookup code" />
+          </div>
+        </div>
+      </div>
+      <button id="bm-search-btn" type="button" class="btn btn-orange btn-block mb-3">Search</button>
+      <div class="bahn-bm-result mt-4" id="bahn-bm-result" style="display:none;"></div>
     </div>
-  `;
+  </div>
+`;
   const mainContent = document.querySelector("#main-content") || document.body;
   mainContent.insertAdjacentHTML("beforeend", html);
-
-  /*
-    Update display of fields based on search mode.
-  */
   const updateFields = () => {
     const mode = document.querySelector('input[name="bm-mode"]:checked')?.value;
     document.getElementById("bahn-bm-fields-findTicket").style.display =
@@ -408,25 +367,20 @@ javascript: (() => {
     document.getElementById("bahn-bm-result").style.display = "none";
     document.getElementById("bahn-bm-result").innerHTML = "";
   };
-  document.querySelectorAll('input[name="bm-mode"]').forEach((radio) => {
-    radio.addEventListener("change", updateFields);
-  });
-
-  /*
-    Run the search and render results.
-    After HTML is inserted, attach each real management panel to its placeholder.
-  */
+  Array.from(document.querySelectorAll('input[name="bm-mode"]')).forEach(
+    (radio) => {
+      radio.addEventListener("change", updateFields);
+    },
+  );
   const searchAction = () => {
     const mode = document.querySelector('input[name="bm-mode"]:checked')?.value;
     const resultDiv = document.getElementById("bahn-bm-result");
     resultDiv.style.display = "none";
     resultDiv.innerHTML = "";
-
     const printError = (msg) => {
       resultDiv.style.display = "";
-      resultDiv.innerHTML = `<div style="color:#c80f2d;font-weight:bold;padding:8px;">${msg}</div>`;
+      resultDiv.innerHTML = `<div class="alert alert-danger">${msg}</div>`;
     };
-
     let payload;
     if (mode === "findTicket") {
       const email = document.getElementById("bm-email")?.value.trim();
@@ -457,24 +411,18 @@ javascript: (() => {
       printError("Only ticket search features are implemented.");
       return;
     }
-
     resultDiv.style.display = "";
     resultDiv.innerHTML = "Loading ...";
     sendTicketSearch(payload)
       .then((json) => {
         if (json?.solutions?.length > 0) {
           resultDiv.innerHTML = formatTicketResponse(json);
-          /*
-               After HTML insertion, add real panels to placeholders
-            */
-          if (json.solutions) {
-            json.solutions.forEach((solution, idx) => {
-              const ph = resultDiv.querySelector(
-                `.bm-manage-placeholder[data-placeholder-idx="${idx}"]`,
-              );
-              if (ph) ph.replaceWith(renderManagementPanel(solution));
-            });
-          }
+          json.solutions.forEach((solution, idx) => {
+            const ph = resultDiv.querySelector(
+              `.bm-manage-placeholder[data-placeholder-idx="${idx}"]`,
+            );
+            if (ph) ph.replaceWith(renderManagementPanel(solution));
+          });
         } else if (json?.message) {
           printError(json.message);
         } else {
@@ -485,11 +433,9 @@ javascript: (() => {
         printError(`Request error: ${error}`);
       });
   };
-
   document
     .getElementById("bm-search-btn")
     ?.addEventListener("click", searchAction);
-
   document
     .querySelectorAll(
       '#bahn-bm-root input[type="text"], #bahn-bm-root input[type="email"]',
