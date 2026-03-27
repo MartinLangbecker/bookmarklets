@@ -51,14 +51,8 @@ javascript: (() => {
     "bg-shock-orange button duration-150 ease-in hover:bg-darker-shock-orange rounded text-white";
   submit.textContent = "Apply code";
 
-  const close = document.createElement("button");
-  close.type = "button";
-  close.className = "button bg-light-blue rounded text-dark-aubergine";
-  close.textContent = "Close";
-
   row.appendChild(input);
   row.appendChild(submit);
-  row.appendChild(close);
 
   container.appendChild(title);
   container.appendChild(description);
@@ -83,8 +77,5 @@ javascript: (() => {
       ev.preventDefault();
       handleSubmit();
     }
-  });
-  close.addEventListener("click", () => {
-    container.remove();
   });
 })();
