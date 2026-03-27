@@ -13,6 +13,7 @@ Since the scripts provided here usually heavily rely on the HTML structure of th
 
 ## Currently available bookmarklets
 - [GoVolta Availability Calendar](./govolta/README.md)
+- [European Sleeper Referral Code](./european_sleeper/README.md)
 
 ## Coding Instructions
 Always use `/* ... */` comments! Since all code within a bookmarklet will be put on a single line inside the bookmark, other types of comment may comment out all code following that comment.
