@@ -1,5 +1,7 @@
 # Hellenic Train Ticket Search
 
+![Hellenic Train connection and ticket search](search.png)
+
 ## Background
 
 When purchasing a ticket on the Hellenic Train app, the app may show:
@@ -38,14 +40,12 @@ language picker.
 
 ## Usage
 
-1. Go to `https://newtickets.hellenictrain.gr`
+1. Go to https://newtickets.hellenictrain.gr
 2. Execute the bookmarklet
 3. Enter your lookup credentials and click Search
 4. You will be redirected to the trip detail page
 
 The search button is disabled until all fields for the selected mode are filled in.
-
-![Hellenic Train connection and ticket search](search.png)
 
 ## Notes
 
