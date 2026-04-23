@@ -124,5 +124,8 @@ https://newtickets.hellenictrain.gr/Channels.HellenicTrainWeb/#/my-travels/detai
   download at all — the endpoint returns `204 No Content` regardless of the `pdfAvailable` flag.
 - Guest purchases cannot be retroactively linked to an account (confirmed by Hellenic Train support).
 - The email sending functionality (`/post/purchase/send/email`) appears broken on Hellenic
-  Train — returns 204 but no email arrives. This likely explains why purchase confirmation
-  emails fail to deliver, which is the original problem the bookmarklet was built to solve.
+  Train — returns 204 but no email arrives. However, password reset emails
+  (`/account/password/reset/mail`) do work, suggesting the issue is specific to the
+  post-purchase email pipeline, not the email system as a whole.
+- Password reset emails are sent by both Hellenic Train and Trenitalia simultaneously
+  if the same email is linked to accounts on both platforms (shared PicoAuth identity).

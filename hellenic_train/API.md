@@ -336,21 +336,63 @@ Change password. Requires Bearer token. Returns `204 No Content` on success.
 { "userName": "<cardNumber>", "oldPassword": "...", "newPassword": "..." }
 ```
 
+Password rules: min 8 chars, at least one uppercase, one lowercase, one digit, one
+special character (`_*-+!?,:;.`). The website UI limits input to 15 characters, but
+the backend accepts longer passwords.
+
 ### `POST /account/password/reset/mail`
 
-Trigger password reset email. Takes an `emailView` object (shape unknown).
+Trigger password reset email. No auth required.
+
+```json
+{ "email": "user@example.com", "host": "https://newtickets.hellenictrain.gr/" }
+```
+
+Returns `204 No Content`. The `host` is used to construct the reset link in the email.
+Password reset emails work correctly (unlike post-purchase confirmation emails).
+
+If the same email is linked to both a Hellenic Train and a Trenitalia account (shared
+PicoAuth identity), both platforms send a reset email simultaneously. The Trenitalia
+email contains a broken link (double URL) because it prepends its own domain to the
+`host` parameter.
+
+The reset link format:
+```
+https://newtickets.hellenictrain.gr/Channels.HellenicTrainWeb/#/recovery-password?idToken=<int>&token=<uuid>&tt1=<signature>
+```
+
+`idToken` is a sequential integer (not random). `tt1` is a signature included in the
+button link but omitted from the plaintext fallback URL. The backend does not require
+`tt1` — security relies on `token` (UUID) alone. Links expire after 3 hours.
 
 ### `POST /account/password/reset`
 
-Reset password with token from email. Takes a `resetPasswordView` object (shape unknown).
+Reset password using the token from the reset email. No auth required.
+
+```json
+{ "idToken": "<int>", "token": "<uuid>", "password": "<newPassword>" }
+```
+
+Requires `channel: 720` and `x-csrf-token` headers.
+
+**Response:**
+```json
+{ "username": "<cardNumber>" }
+```
+
+Returns the username (card number) whose password was changed.
+
+Notes:
+- The `tt1` parameter from the reset link is not sent in the request — only `idToken`
+  and `token` are used. Security relies on the UUID `token` alone.
+- The reset email's plaintext fallback URL omits `tt1`, which works fine since the
+  backend doesn't require it.
+- No check whether the new password is identical to the old one.
 
 ### `POST /user/profile`
 
 Session initialization call made after login. Returns combined user + customer profile.
-
-```json
-{ "userName": "<cardNumber>", "password": null }
-```
+Body is optional — the user is identified from the Bearer token.
 
 Returns `user` (basic info + groups), `customer` (full CRM profile), `channelsMap`,
 `selectedChannel`, and `role`. Confirms channel 720 = `B2C_TRAINOSE`.
@@ -413,3 +455,9 @@ Find nearest station.
 - Smart Refund and Compensation actions are not available via the API (handled by the native detail page UI).
 - Many Trenitalia features (receipts, Trenitalia Pass, Freccia Club, etc.) exist in the
   codebase but are not active on the Hellenic Train backend.
+- Backend error messages are returned in the user's preferred language (set on the
+  Trenitalia account, shared via PicoAuth). They are not hardcoded to German.
+- Hellenic Train and Trenitalia share the same PicoAuth identity system. Accounts are
+  separate but linked by email. Password resets trigger on both platforms simultaneously.
+- Post-purchase emails (confirmation, resend) are broken on Hellenic Train. Password
+  reset emails work correctly — different mail pipelines.
