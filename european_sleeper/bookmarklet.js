@@ -41,7 +41,7 @@ javascript: (() => {
   const input = document.createElement("input");
   input.type = "text";
   input.inputMode = "text";
-  input.placeholder = "e.g. 20OFFINJUNE";
+  input.placeholder = "e.g. 20OFFINJUNE, EARTHDAY26, HOURRAIL15, ...";
   input.setAttribute("aria-label", "Referral code");
   input.className = "es-input";
 
@@ -68,6 +68,7 @@ javascript: (() => {
 
   const handleSubmit = () => {
     const code = input.value.trim();
+    if (!code) return;
     goToReferral(code);
   };
 
