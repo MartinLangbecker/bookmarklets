@@ -5,17 +5,17 @@ This repository contains a collections of bookmarklets that are more or less use
 Since the scripts provided here usually heavily rely on the HTML structure of the website they're targeted at, they may break at any time if the website in question is changed. Use at your own risk.
 
 ## Usage Instructions
-1. Copy code in bookmarklet (e.g. using button "Copy raw file" on the top right).
-2. Create a new bookmark in your browser using the code as URL.
-3. Visit the website the bookmarklet is intended for.
-4. Click on the bookmark.
-5. Depending on the contents of the bookmarklet, some new content should become visible.
+1. Visit the [installation page](https://martinlangbecker.github.io/bookmarklets/) and drag the desired bookmarklet to your bookmark bar.
+2. Visit the website the bookmarklet is intended for.
+3. Click on the bookmark.
+4. Depending on the contents of the bookmarklet, some new content should become visible.
 
 ## Currently available bookmarklets
 - [GoVolta Availability Calendar](./govolta/README.md)
 - [European Sleeper Referral Code](./european_sleeper/README.md)
 - [Hellenic Train Ticket Search](hellenic_train/README.md)
 - [MÁV Hidden Stations](mav_hidden_stations/README.md)
+- [Eurostar STAFF Prices](eurostar_staff_prices/README.md)
 
 ## Coding Instructions
 Always use `/* ... */` comments! Since all code within a bookmarklet will be put on a single line inside the bookmark, other types of comment may comment out all code following that comment.
