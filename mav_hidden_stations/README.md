@@ -11,13 +11,15 @@ The [MÁV ticket shop](https://jegy.mav.hu/) only exposes a subset of stations t
 
 This bookmarklet injects these "hidden" stations into the station picker by patching the cached station list in the browser's CacheStorage. After injection, you can search for and book tickets to/from stations that MÁV doesn't officially list.
 
+## Installation
+
+Install the bookmarklet from the [installation page](https://martinlangbecker.github.io/bookmarklets/).
+
 ## Usage
 
-1. Copy the contents of [`bookmarklet.js`](./bookmarklet.js).
-2. Create a new bookmark in your browser using the code as URL.
-3. Visit https://jegy.mav.hu and perform at least one search (so the station list gets cached).
-4. Click the bookmarklet. An alert will confirm how many stations were injected.
-5. Reload the page. The hidden stations are now available in the station picker.
+1. Visit https://jegy.mav.hu and perform at least one search (so the station list gets cached).
+2. Click the bookmarklet. An alert will confirm how many stations were injected.
+3. Reload the page. The hidden stations are now available in the station picker.
 
 ## How it works
 

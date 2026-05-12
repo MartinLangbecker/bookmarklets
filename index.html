@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookmarklets</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        a.bookmarklet { display: inline-block; margin: 0.5rem 0; padding: 0.5rem 1rem; background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333; cursor: grab; }
+        a.bookmarklet:hover { background: #e0e0e0; }
+        p.hint { color: #666; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <h1>Bookmarklets</h1>
+    <p class="hint">Drag these links to your bookmark bar:</p>
+    <ul id="list"></ul>
+    <script>
+        const bookmarklets = [
+            { name: "GoVolta Availability Calendar", src: "govolta/bookmarklet.js" },
+            { name: "European Sleeper Referral Code", src: "european_sleeper/bookmarklet.js" },
+            { name: "Hellenic Train Ticket Search", src: "hellenic_train/bookmarklet.js" },
+            { name: "MÁV Hidden Stations", src: "mav_hidden_stations/bookmarklet.js" },
+            { name: "Eurostar STAFF Prices", src: "eurostar_staff_prices/bookmarklet.js" },
+        ];
+        const list = document.getElementById("list");
+        bookmarklets.forEach(({ name, src }) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.className = "bookmarklet";
+            a.textContent = name;
+            a.href = "#";
+            li.appendChild(a);
+            list.appendChild(li);
+            fetch(src)
+                .then(r => r.text())
+                .then(code => { a.href = code.trim(); });
+        });
+    </script>
+</body>
+</html>

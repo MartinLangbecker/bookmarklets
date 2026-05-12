@@ -38,6 +38,10 @@ buttons, input group styling) and supports all three site languages (English, It
 Greek). Language is auto-detected and updates when the user switches via the site's
 language picker.
 
+## Installation
+
+Install the bookmarklet from the [installation page](https://martinlangbecker.github.io/bookmarklets/).
+
 ## Usage
 
 1. Go to https://newtickets.hellenictrain.gr

@@ -8,6 +8,10 @@ This bookmarklet enhances the [European Sleeper website](https://europeansleeper
 
 Basically, it provides a more convenient way to redirect to https://europeansleeper.eu/referral?referralCode=<code\>.
 
+## Installation
+
+Install the bookmarklet from the [installation page](https://martinlangbecker.github.io/bookmarklets/).
+
 ## Usage
 
 1. Go to https://europeansleeper.eu; change language as needed.

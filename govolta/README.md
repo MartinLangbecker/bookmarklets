@@ -19,6 +19,10 @@ The maximum number of seats changes at an observed cutoff date (2026-09-28):
 
 Since this script works only based on data provided on the website, no requests are sent during its execution and no further functionality is provided.
 
+## Installation
+
+Install the bookmarklet from the [installation page](https://martinlangbecker.github.io/bookmarklets/).
+
 ## Usage
 
 1. Go to https://govolta.nl; change language as needed.
