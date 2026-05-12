@@ -1,7 +1,8 @@
 javascript: (() => {
   const PUB_MARKER = '%22productFamilies%22:[%22PUB%22]';
-  const STAFF_MARKER = '%22productFamilies%22:[%22PUB%22]'.replace('PUB', 'STAFF');
+  const STAFF_MARKER = '%22productFamilies%22:[%22STAFF%22]';
 
+  /* Patch fetch — not currently used by Eurostar, but kept as fallback in case they switch */
   const originalFetch = window.fetch;
   window.fetch = async function (url, options) {
     if (options && options.body && typeof options.body === 'string' && options.body.includes(PUB_MARKER)) {
@@ -11,6 +12,7 @@ javascript: (() => {
     return originalFetch.apply(this, arguments);
   };
 
+  /* Patch XHR — this is what Eurostar currently uses for search requests */
   const originalXhrSend = XMLHttpRequest.prototype.send;
   XMLHttpRequest.prototype.send = function (body) {
     if (body && typeof body === 'string' && body.includes(PUB_MARKER)) {

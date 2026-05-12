@@ -4,12 +4,15 @@ Bookmarklet for [eurostar.com](https://www.eurostar.com) that switches search re
 
 ![Eurostar booking page showing STAFF prices](staff_prices.png)
 
+## Installation
+
+Install the bookmarklet from the [installation page](https://martinlangbecker.github.io/bookmarklets/).
+
 ## Usage
 
-1. Install the bookmarklet from the [installation page](https://martinlangbecker.github.io/bookmarklets/).
-2. On eurostar.com, start a search (e.g. Brussels → London).
-3. On the results page, click the bookmarklet → "STAFF aktiv!" alert appears.
-4. Switch to a **different date** in the date bar → STAFF prices are shown.
+1. On eurostar.com, start a search (e.g. Brussels → London).
+2. On the results page, click the bookmarklet → "STAFF prices active" alert appears.
+3. Switch to a **different date** in the date bar → STAFF prices are shown.
 
 ## Notes
 
