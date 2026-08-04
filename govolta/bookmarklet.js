@@ -4,7 +4,7 @@ javascript: (() => {
   const getCapacity = (date) =>
     date < CUTOFF
       ? { economy: 602, komfort: 66 }
-      : { economy: 516, komfort: 132 };
+      : { economy: 466, komfort: 132 };
 
   if (!document.getElementById("custom-ticket-info-style")) {
     const style = document.createElement("style");

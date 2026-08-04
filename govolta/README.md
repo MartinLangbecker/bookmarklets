@@ -15,7 +15,9 @@ This bookmarklet enhances the GoVolta price calendar view by displaying base pri
 The maximum number of seats changes at an observed cutoff date (2026-09-28):
 
 - Before: 602 Economy (7 × 86) / 66 Komfort (1 × 66, half-capacity policy)
-- After: 516 Economy (6 × 86) / 132 Komfort (2 × 66, all seats sold)
+- After: 466 Economy (6 cars, operational max) / 132 Komfort (2 × 66, all seats sold)
+
+Both the Berlin and Paris routes share the same post-cutoff capacity. Individual dates may have higher capacity (different trainset), and capacity changes may occur in the future. Prices and seat counts are always correct since they are extracted directly from the website; however, the color indicators may be inaccurate if the actual capacity differs from the assumed values.
 
 Since this script works only based on data provided on the website, no requests are sent during its execution and no further functionality is provided.
 

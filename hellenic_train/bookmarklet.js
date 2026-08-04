@@ -19,6 +19,8 @@ javascript: (() => {
       guest: "Rescue Code",
       email: "E-Mail",
       pnr: "PNR / Ticket Code",
+      pnrOnly: "PNR",
+      cp: "CP",
       firstName: "First name",
       lastName: "Last name",
       rescueCode: "Rescue code",
@@ -36,6 +38,8 @@ javascript: (() => {
       guest: "Codice di recupero",
       email: "E-Mail",
       pnr: "PNR / Codice biglietto",
+      pnrOnly: "PNR",
+      cp: "CP",
       firstName: "Nome",
       lastName: "Cognome",
       rescueCode: "Codice di recupero",
@@ -53,6 +57,8 @@ javascript: (() => {
       guest: "Κωδικός ανάκτησης",
       email: "E-Mail",
       pnr: "PNR / Κωδικός εισιτηρίου",
+      pnrOnly: "PNR",
+      cp: "CP",
       firstName: "Όνομα",
       lastName: "Επώνυμο",
       rescueCode: "Κωδικός ανάκτησης",
@@ -147,8 +153,8 @@ javascript: (() => {
               </div>
               <div id="ht-bm-fields-pnrCp" style="display:none;">
                 <div class="row mb-2">
-                  <div class="col-md-6 mb-2 mb-md-0">${inputGroup("pnr", "bm-pnr2")}</div>
-                  <div class="col-md-6">${inputGroup("pnrCp", "bm-cp2")}</div>
+                  <div class="col-md-6 mb-2 mb-md-0">${inputGroup("pnrOnly", "bm-pnr2")}</div>
+                  <div class="col-md-6">${inputGroup("cp", "bm-cp2")}</div>
                 </div>
               </div>
               <div id="ht-bm-fields-guest" style="display:none;">

@@ -41,7 +41,7 @@ javascript: (() => {
   const input = document.createElement("input");
   input.type = "text";
   input.inputMode = "text";
-  input.placeholder = "e.g. 20OFFINJUNE, EARTHDAY26, HOURRAIL15, ...";
+  input.placeholder = "e.g. 20OFFINJUNE, EARTHDAY26, HOURRAIL15, EARLYBIRD2027, ...";
   input.setAttribute("aria-label", "Referral code");
   input.className = "es-input";
 

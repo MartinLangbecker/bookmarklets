@@ -63,3 +63,11 @@ The search button is disabled until all fields for the selected mode are filled 
 - Management options on the detail page include "Request compensation", which becomes
   active after the trip has taken place. This makes it important to be able to retrieve
   past tickets — especially guest purchases that aren't linked to any account.
+- As of September 2025, Hellenic Train officially restricts online ticket changes to
+  registered app users only. Unregistered users are told to submit a written request
+  via the Contact Form or visit a station ticket office. However, the trip detail page
+  (which this bookmarklet links to) exposes the same change/refund options regardless
+  of registration status — the restriction is only in the UI, not the backend. This
+  means unregistered users can change or cancel tickets online via this bookmarklet,
+  even though Hellenic Train's official communication suggests otherwise.
+  ([Source: Timetable changes from 15/9/2025](https://www.hellenictrain.gr/en/timetable-changes-1592025))
