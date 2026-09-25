@@ -7,14 +7,25 @@
         body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
         a.bookmarklet { display: inline-block; margin: 0.5rem 0; padding: 0.5rem 1rem; background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; text-decoration: none; color: #333; cursor: grab; }
         a.bookmarklet:hover { background: #e0e0e0; }
+        a.bookmarklet.loading { opacity: 0.5; cursor: progress; }
+        a.bookmarklet.failed { opacity: 0.5; cursor: not-allowed; color: #b00; }
         p.hint { color: #666; font-size: 0.9rem; }
+        #file-warning { background: #fff3cd; border: 1px solid #ffe08a; border-radius: 4px; padding: 0.6rem 0.8rem; color: #664d03; font-size: 0.9rem; }
+        #file-warning code { background: rgba(0,0,0,0.06); padding: 0.05rem 0.3rem; border-radius: 3px; }
     </style>
 </head>
 <body>
     <h1>Bookmarklets</h1>
-    <p class="hint">Drag these links to your bookmark bar:</p>
+    <div id="file-warning" hidden>
+        Opened as a local <code>file://</code> — browsers block loading the scripts, so the
+        links stay inactive. Open the <a href="https://martinlangbecker.github.io/bookmarklets/">hosted page</a> instead.
+    </div>
+    <p class="hint">Drag a link to your bookmark bar.</p>
     <ul id="list"></ul>
     <script>
+        if (location.protocol === "file:") {
+            document.getElementById("file-warning").hidden = false;
+        }
         const bookmarklets = [
             { name: "GoVolta Availability Calendar", src: "govolta/bookmarklet.js" },
             { name: "European Sleeper Referral Code", src: "european_sleeper/bookmarklet.js" },
@@ -26,14 +37,26 @@
         bookmarklets.forEach(({ name, src }) => {
             const li = document.createElement("li");
             const a = document.createElement("a");
-            a.className = "bookmarklet";
+            a.className = "bookmarklet loading";
             a.textContent = name;
             a.href = "#";
+            a.setAttribute("aria-disabled", "true");
+            a.addEventListener("click", (e) => {
+                if (a.classList.contains("loading") || a.classList.contains("failed")) e.preventDefault();
+            });
             li.appendChild(a);
             list.appendChild(li);
             fetch(src)
-                .then(r => r.text())
-                .then(code => { a.href = code.trim(); });
+                .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+                .then(code => {
+                    a.href = code.trim();
+                    a.classList.remove("loading");
+                    a.removeAttribute("aria-disabled");
+                })
+                .catch(() => {
+                    a.classList.replace("loading", "failed");
+                    a.title = "Could not load the script";
+                });
         });
     </script>
 </body>

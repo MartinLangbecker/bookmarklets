@@ -240,11 +240,14 @@ javascript: (() => {
 
     let payload;
     if (mode === "pnrEmail") {
-      payload = {
-        recoverType: "PNR_EMAIL",
-        pnr: val("bm-pnr"),
-        email: val("bm-email"),
-      };
+      const idVal = val("bm-pnr");
+      payload = { recoverType: "PNR_EMAIL", email: val("bm-email") };
+      /* matches a string of only digits, 6 or more */
+      if (/^\d{6,}$/.test(idVal)) {
+        payload.entitlementId = idVal;
+      } else {
+        payload.pnr = idVal;
+      }
     } else if (mode === "pnrCp") {
       payload = {
         recoverType: "PNR_CP",

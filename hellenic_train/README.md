@@ -23,13 +23,17 @@ website. This bookmarklet fills that gap.
 ## What it does
 
 Searches for a ticket using one of three lookup methods:
-- Email + PNR
+- Email + PNR (or ticket code)
 - PNR + CP
 - Name + Rescue code
 
 On success, redirects to the Hellenic Train website's native trip detail page, which
 supports viewing ticket details, changing connections, changing tickets, refunds, and
 requesting compensation for past trips.
+
+The Email + PNR method accepts two kinds of identifier: a short alphanumeric PNR (sent
+as `pnr`) or the numeric ticket code (sent as `entitlementId`). A PNR is not always
+present, but the ticket code always is.
 
 On failure, shows an error message.
 
